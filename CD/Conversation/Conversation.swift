@@ -11,4 +11,8 @@ import Foundation
 struct Conversation {
     let contact: Contact
     let mostRecentMessage: Message
+
+    var messageListID: String {
+        return mostRecentMessage.messageListID
+    }
 }
