@@ -12,5 +12,9 @@ import CoreData
 
 @objc(ConversationData)
 public class ConversationData: NSManagedObject {
-
+    convenience init(conversation: Conversation, context: NSManagedObjectContext) {
+        self.init(context: context)
+        contact = ContactData(contact: conversation.contact, context: context)
+        mostRecentMessage = MessageData(message: conversation.mostRecentMessage, context: context)
+    }
 }

@@ -12,5 +12,9 @@ import CoreData
 
 @objc(ContactData)
 public class ContactData: NSManagedObject {
-
+    convenience init(contact: Contact, context: NSManagedObjectContext) {
+        self.init(context: context)
+        id = contact.id
+        name = contact.name
+    }
 }

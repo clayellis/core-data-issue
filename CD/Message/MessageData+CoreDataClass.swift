@@ -12,5 +12,10 @@ import CoreData
 
 @objc(MessageData)
 public class MessageData: NSManagedObject {
-
+    convenience init(message: Message, context: NSManagedObjectContext) {
+        self.init(context: context)
+        id = message.id
+        messageListID = message.messageListID
+        body = message.body
+    }
 }
