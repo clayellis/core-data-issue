@@ -29,7 +29,9 @@ class ContactStore: Store {
                 }
 
                 print("ContactStore found conversation for contact: \(contact)")
-
+                if let contact = conversation.contact {
+                    context.delete(contact)
+                }
                 conversation.contact = contactData
             }
 

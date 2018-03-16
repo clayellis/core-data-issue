@@ -14,7 +14,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     var coreDataStack: CoreDataStack!
-    let url = URL(fileURLWithPath: "/Users/clay/Desktop/CD/CD.sqlite")
+    let url = URL(fileURLWithPath: "/Users/jasenk/Desktop/CD/CD.sqlite")
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         resetStore()
