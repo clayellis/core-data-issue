@@ -25,20 +25,26 @@ class CoreDataStack {
         container.performBackgroundTask(task)
     }
 
-    init(modelName: String) {
-        let description = NSPersistentStoreDescription()
-        description.shouldAddStoreAsynchronously = true
-
-        container = NSPersistentContainer(name: modelName)
-        container.persistentStoreDescriptions = [description]
+    func loadStore(_ completion: @escaping (Error?) -> Void) {
         container.loadPersistentStores { [weak container] description, error in
-            if let error = error {
-                fatalError("Error occurred while loading persistent stores: \(error)")
+            guard error == nil else {
+                completion(error)
+                return
             }
 
             print("Persistent Store: \(description)")
             container?.viewContext.automaticallyMergesChangesFromParent = true
             container?.viewContext.mergePolicy = NSMergeByPropertyStoreTrumpMergePolicy
+            completion(nil)
         }
+    }
+
+    init(modelName: String) {
+        let description = NSPersistentStoreDescription()
+        description.shouldAddStoreAsynchronously = true
+        description.url = URL(fileURLWithPath: "/Users/clay/Desktop/CD/CD.sqlite")
+
+        container = NSPersistentContainer(name: modelName)
+        container.persistentStoreDescriptions = [description]
     }
 }

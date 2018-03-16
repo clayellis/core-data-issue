@@ -17,7 +17,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         coreDataStack = CoreDataStack(modelName: "CD")
-        run()
+        coreDataStack.loadStore { error in
+            if let error = error {
+                fatalError("Failed to load store: \(error)")
+            }
+
+            self.run()
+        }
 
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.rootViewController = ViewController()
