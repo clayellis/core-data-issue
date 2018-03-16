@@ -76,7 +76,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var delayOffset: TimeInterval = 0
 
     func delay(_ closure: @escaping () -> Void) {
-        delayOffset += 2
+        delayOffset += 1
         DispatchQueue.main.asyncAfter(deadline: .now() + delayOffset) {
             closure()
         }
