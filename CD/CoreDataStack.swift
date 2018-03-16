@@ -18,25 +18,9 @@ class CoreDataStack {
     }
 
     var backgroundContext: NSManagedObjectContext {
-        return container.newBackgroundContext()
-    }
-
-    func performBackgroundTask(_ task: @escaping (NSManagedObjectContext) -> Void) {
-        container.performBackgroundTask(task)
-    }
-
-    func loadStore(_ completion: @escaping (Error?) -> Void) {
-        container.loadPersistentStores { [weak container] description, error in
-            guard error == nil else {
-                completion(error)
-                return
-            }
-
-            print("Persistent Store: \(description)")
-            container?.viewContext.automaticallyMergesChangesFromParent = true
-            container?.viewContext.mergePolicy = NSMergeByPropertyStoreTrumpMergePolicy
-            completion(nil)
-        }
+        let context = container.newBackgroundContext()
+        configure(context: context)
+        return context
     }
 
     init(modelName: String, url: URL) {
@@ -46,5 +30,30 @@ class CoreDataStack {
 
         container = NSPersistentContainer(name: modelName)
         container.persistentStoreDescriptions = [description]
+    }
+
+    func loadStore(_ completion: @escaping (Error?) -> Void) {
+        container.loadPersistentStores { description, error in
+            guard error == nil else {
+                completion(error)
+                return
+            }
+
+            print("Persistent Store: \(description)")
+            self.configure(context: self.container.viewContext)
+            completion(nil)
+        }
+    }
+
+    func performBackgroundTask(_ task: @escaping (NSManagedObjectContext) -> Void) {
+        container.performBackgroundTask { context in
+            self.configure(context: context)
+            task(context)
+        }
+    }
+
+    private func configure(context: NSManagedObjectContext) {
+        context.automaticallyMergesChangesFromParent = true
+        context.mergePolicy = NSMergeByPropertyStoreTrumpMergePolicy
     }
 }
