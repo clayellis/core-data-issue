@@ -67,8 +67,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             messageStore.store(message: message)
         }
 
-//        let newMessage = Message(id: "message.2", messageListID: message.messageListID, body: "The second message", timestamp: Date())
-//        messageStore.store(message: newMessage)
+        delay {
+            let newMessage = Message(id: "message.2", messageListID: message.messageListID, body: "The second message", timestamp: Date())
+            messageStore.store(message: newMessage)
+        }
     }
 
     var delayOffset: TimeInterval = 0
