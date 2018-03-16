@@ -12,4 +12,5 @@ struct Message {
     let id: String
     let messageListID: String
     let body: String
+    let timestamp: Date
 }

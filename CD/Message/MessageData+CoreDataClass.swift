@@ -17,5 +17,6 @@ public class MessageData: NSManagedObject {
         id = message.id
         messageListID = message.messageListID
         body = message.body
+        timestamp = message.timestamp as NSDate
     }
 }

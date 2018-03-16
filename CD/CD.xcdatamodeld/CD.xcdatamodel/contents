@@ -24,6 +24,7 @@
         <attribute name="body" attributeType="String" syncable="YES"/>
         <attribute name="id" attributeType="String" syncable="YES"/>
         <attribute name="messageListID" attributeType="String" syncable="YES"/>
+        <attribute name="timestamp" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <relationship name="conversation" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ConversationData" inverseName="mostRecentMessage" inverseEntity="ConversationData" syncable="YES"/>
         <uniquenessConstraints>
             <uniquenessConstraint>
@@ -33,7 +34,7 @@
     </entity>
     <elements>
         <element name="ContactData" positionX="-63" positionY="-18" width="128" height="90"/>
-        <element name="MessageData" positionX="-54" positionY="9" width="128" height="105"/>
+        <element name="MessageData" positionX="-54" positionY="9" width="128" height="120"/>
         <element name="ConversationData" positionX="-36" positionY="36" width="128" height="90"/>
     </elements>
 </model>

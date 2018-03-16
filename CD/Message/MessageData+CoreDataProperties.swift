@@ -20,6 +20,7 @@ extension MessageData {
     @NSManaged public var id: String?
     @NSManaged public var messageListID: String?
     @NSManaged public var body: String?
+    @NSManaged public var timestamp: NSDate?
     @NSManaged public var conversation: ConversationData?
 
 }
