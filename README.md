@@ -27,3 +27,47 @@ It should be reasonable to expect Core Data to apply the correct merge policy an
 6. Save the context.
 
 **The workaround produces the expected outcome.** But it is not ideal because of the intermediate save and fetch steps.
+
+# Demonstration Model
+
+In this demonstration there are three models: `Contact`, `Message`, and `Conversation`. Each model has a Core Data variant named `*Data`.
+
+### `Contact`
+
+```swift
+struct Contact {
+    let id: String
+    let name: String
+}
+```
+
+A `Contact`'s Core Data variant (`ContactData`) is uniquely constrained by its `id`.
+
+### `Message`
+
+```swift
+struct Message {
+    let id: String
+    let messageListID: String
+    let body: String
+    let timestamp: Date
+}
+```
+A `Message`'s Core Data variant (`MessageData`) is uniquely constrained by its `id`.
+
+### `Conversation`
+
+```swift
+struct Conversation {
+    let contact: Contact
+    let mostRecentMessage: Message
+
+    var messageListID: String {
+        return mostRecentMessage.messageListID
+    }
+}
+```
+
+A `Conversation`'s Core Data variant (`ConversationData`) is uniquely constrained by its `messageListID`.
+
+`ConversationData` has a to-one relationship with a `ContactData` and a `MessageData`.
