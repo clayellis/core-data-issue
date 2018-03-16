@@ -39,10 +39,10 @@ class CoreDataStack {
         }
     }
 
-    init(modelName: String) {
+    init(modelName: String, url: URL) {
         let description = NSPersistentStoreDescription()
         description.shouldAddStoreAsynchronously = true
-        description.url = URL(fileURLWithPath: "/Users/clay/Desktop/CD/CD.sqlite")
+        description.url = url
 
         container = NSPersistentContainer(name: modelName)
         container.persistentStoreDescriptions = [description]
