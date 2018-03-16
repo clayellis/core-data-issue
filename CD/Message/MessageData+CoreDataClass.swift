@@ -12,6 +12,7 @@ import CoreData
 
 @objc(MessageData)
 public class MessageData: NSManagedObject {
+    @discardableResult
     convenience init(message: Message, context: NSManagedObjectContext) {
         self.init(context: context)
         id = message.id

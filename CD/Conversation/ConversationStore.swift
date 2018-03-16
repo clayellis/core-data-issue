@@ -24,7 +24,7 @@ class ConversationStore: Store {
                 print("ConversationStore save")
                 try context.save()
             } catch {
-                print(error)
+                print(error.humanReadableString)
             }
         }
     }
