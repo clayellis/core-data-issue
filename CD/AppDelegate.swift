@@ -58,10 +58,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let conversation = Conversation(contact: contact, mostRecentMessage: message)
 
         conversationStore.store(conversation: conversation)
-        contactStore.store(contact: contact)
-        messageStore.store(message: message)
+
+        delay {
+            contactStore.store(contact: contact)
+        }
+
+        delay {
+            messageStore.store(message: message)
+        }
 
 //        let newMessage = Message(id: "message.2", messageListID: message.messageListID, body: "The second message", timestamp: Date())
 //        messageStore.store(message: newMessage)
+    }
+
+    var delayOffset: TimeInterval = 0
+
+    func delay(_ closure: @escaping () -> Void) {
+        delayOffset += 2
+        DispatchQueue.main.asyncAfter(deadline: .now() + delayOffset) {
+            closure()
+        }
     }
 }
