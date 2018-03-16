@@ -15,7 +15,8 @@ class ConversationStore: Store {
     }
 
     func store(conversations: [Conversation]) {
-        coreDataStack.performBackgroundTask { context in
+        let context = coreDataStack.viewContext
+        context.perform {
             for conversation in conversations {
                 ConversationData(conversation: conversation, context: context)
             }
