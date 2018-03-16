@@ -15,6 +15,27 @@ class ContactStore: Store {
     }
 
     func store(contacts: [Contact]) {
+        coreDataStack.performBackgroundTask { context in
+            for contact in contacts {
+                let contactData = ContactData(contact: contact, context: context)
 
+                // If the contact is part of a conversation, update the conversation
+                let request: NSFetchRequest<ConversationData> = ConversationData.fetchRequest()
+                request.predicate = NSPredicate(format: "contact.id == %@", contact.id)
+                let results = try! context.fetch(request)
+
+                guard let conversation = results.first else {
+                    continue
+                }
+
+                conversation.contact = contactData
+            }
+
+            do {
+                try context.save()
+            } catch {
+                print(error)
+            }
+        }
     }
 }
