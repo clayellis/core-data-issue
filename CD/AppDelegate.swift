@@ -60,5 +60,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         conversationStore.store(conversation: conversation)
         contactStore.store(contact: contact)
         messageStore.store(message: message)
+
+//        let newMessage = Message(id: "message.2", messageListID: message.messageListID, body: "The second message", timestamp: Date())
+//        messageStore.store(message: newMessage)
     }
 }
