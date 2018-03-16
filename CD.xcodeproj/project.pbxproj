@@ -28,6 +28,7 @@
 		6F365E09205C345A00ED1B28 /* MessageStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F365E08205C345A00ED1B28 /* MessageStore.swift */; };
 		6F365E0B205C347400ED1B28 /* ConversationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F365E0A205C347400ED1B28 /* ConversationStore.swift */; };
 		6F365E0D205C4F6B00ED1B28 /* Error+Print.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F365E0C205C4F6B00ED1B28 /* Error+Print.swift */; };
+		6F365E10205C7D1E00ED1B28 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 6F365E0F205C7D1E00ED1B28 /* README.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -66,6 +67,7 @@
 		6F365E08205C345A00ED1B28 /* MessageStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageStore.swift; sourceTree = "<group>"; };
 		6F365E0A205C347400ED1B28 /* ConversationStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationStore.swift; sourceTree = "<group>"; };
 		6F365E0C205C4F6B00ED1B28 /* Error+Print.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Error+Print.swift"; sourceTree = "<group>"; };
+		6F365E0F205C7D1E00ED1B28 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -107,6 +109,7 @@
 		6F365DC7205C2C9700ED1B28 /* CD */ = {
 			isa = PBXGroup;
 			children = (
+				6F365E0F205C7D1E00ED1B28 /* README.md */,
 				6F365DC8205C2C9700ED1B28 /* AppDelegate.swift */,
 				6F365E00205C2F0700ED1B28 /* CoreDataStack.swift */,
 				6F365E0C205C4F6B00ED1B28 /* Error+Print.swift */,
@@ -248,6 +251,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6F365E10205C7D1E00ED1B28 /* README.md in Resources */,
 				6F365DD6205C2C9700ED1B28 /* LaunchScreen.storyboard in Resources */,
 				6F365DD3205C2C9700ED1B28 /* Assets.xcassets in Resources */,
 			);
