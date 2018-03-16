@@ -54,6 +54,6 @@ class CoreDataStack {
 
     private func configure(context: NSManagedObjectContext) {
         context.automaticallyMergesChangesFromParent = true
-        context.mergePolicy = NSMergeByPropertyStoreTrumpMergePolicy
+//        context.mergePolicy = NSMergeByPropertyStoreTrumpMergePolicy
     }
 }

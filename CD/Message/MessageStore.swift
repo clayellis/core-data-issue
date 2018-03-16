@@ -39,7 +39,7 @@ class MessageStore: Store {
                 print("MessageStore save")
                 try context.save()
             } catch {
-                print(error)
+                print(error.humanReadableString)
             }
         }
     }

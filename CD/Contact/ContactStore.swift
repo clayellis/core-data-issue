@@ -37,7 +37,7 @@ class ContactStore: Store {
                 print("ContactStore save")
                 try context.save()
             } catch {
-                print(error)
+                print(error.humanReadableString)
             }
         }
     }
