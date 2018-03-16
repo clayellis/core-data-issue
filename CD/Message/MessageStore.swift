@@ -28,9 +28,18 @@ class MessageStore: Store {
                     continue
                 }
 
+                print("MessageStore found conversation for message: \(message)")
+
                 if message.timestamp > conversation.mostRecentMessage!.timestamp as Date! {
                     conversation.mostRecentMessage = messageData
                 }
+            }
+
+            do {
+                print("MessageStore save")
+                try context.save()
+            } catch {
+                print(error)
             }
         }
     }

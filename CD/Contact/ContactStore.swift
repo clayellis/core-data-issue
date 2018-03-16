@@ -28,10 +28,13 @@ class ContactStore: Store {
                     continue
                 }
 
+                print("ContactStore found conversation for contact: \(contact)")
+
                 conversation.contact = contactData
             }
 
             do {
+                print("ContactStore save")
                 try context.save()
             } catch {
                 print(error)

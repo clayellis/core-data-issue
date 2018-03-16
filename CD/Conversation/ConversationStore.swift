@@ -21,6 +21,7 @@ class ConversationStore: Store {
             }
 
             do {
+                print("ConversationStore save")
                 try context.save()
             } catch {
                 print(error)
