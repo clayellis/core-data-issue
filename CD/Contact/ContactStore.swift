@@ -15,8 +15,7 @@ class ContactStore: Store {
     }
 
     func store(contacts: [Contact]) {
-        let context = coreDataStack.viewContext
-        context.perform {
+        coreDataStack.performBackgroundTask { context in
             for contact in contacts {
                 ContactData(contact: contact, context: context)
             }

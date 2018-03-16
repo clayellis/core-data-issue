@@ -15,8 +15,7 @@ class MessageStore: Store {
     }
 
     func store(messages: [Message]) {
-        let context = coreDataStack.viewContext
-        context.perform {
+        coreDataStack.performBackgroundTask { context in
             for message in messages {
                 MessageData(message: message, context: context)
             }
