@@ -15,8 +15,8 @@ It should be reasonable to expect Core Data to apply the correct merge policy an
 2. The relationship between the new instance and the fetched object is established.
 
 ### The actual outcome is:
-1. The new instance is stored and updated. (Expected)
-2. The relationship between the source and destination object is broken. (Unexpected)
+1. The new instance is stored and updated. (***Expected***)
+2. The relationship between the source and destination object is broken. (***Unexpected***)
 
 ### The current workaround is:
 1. Insert a new instance of a unique object.
