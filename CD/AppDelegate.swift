@@ -14,9 +14,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     var coreDataStack: CoreDataStack!
+    let url = URL(fileURLWithPath: "/Users/clay/Desktop/CD/CD.sqlite")
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        coreDataStack = CoreDataStack(modelName: "CD")
+        resetStore()
+        coreDataStack = CoreDataStack(modelName: "CD", url: url)
         coreDataStack.loadStore { error in
             if let error = error {
                 fatalError("Failed to load store: \(error)")
@@ -31,13 +33,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return true
     }
 
+    func resetStore() {
+        let directoryURL = url.deletingLastPathComponent()
+        do {
+            try FileManager.default.removeItem(at: directoryURL)
+        } catch {
+            print("Failed to delete store directory \(directoryURL): \(error)")
+        }
+
+        do {
+            try FileManager.default.createDirectory(at: directoryURL, withIntermediateDirectories: false, attributes: nil)
+        } catch {
+            print("Failed to create store directory \(directoryURL): \(error)")
+        }
+    }
+
     func run() {
         let contactStore = ContactStore(coreDataStack: coreDataStack)
         let messageStore = MessageStore(coreDataStack: coreDataStack)
         let conversationStore = ConversationStore(coreDataStack: coreDataStack)
 
         let contact = Contact(id: "contact.1", name: "Clay Ellis")
-        let message = Message(id: "message.1", messageListID: "messageList.1", body: "Hello, Clay.")
+        let message = Message(id: "message.1", messageListID: "messageList.1", body: "Hello, Clay.", timestamp: Date())
         let conversation = Conversation(contact: contact, mostRecentMessage: message)
 
         conversationStore.store(conversation: conversation)
