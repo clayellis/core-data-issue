@@ -12,8 +12,10 @@ import CoreData
 
 @objc(ConversationData)
 public class ConversationData: NSManagedObject {
+    @discardableResult
     convenience init(conversation: Conversation, context: NSManagedObjectContext) {
         self.init(context: context)
+        messageListID = conversation.mostRecentMessage.messageListID
         contact = ContactData(contact: conversation.contact, context: context)
         mostRecentMessage = MessageData(message: conversation.mostRecentMessage, context: context)
     }
