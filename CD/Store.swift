@@ -9,9 +9,9 @@
 import Foundation
 
 class Store {
-    let coreDataStack: CoreDataStack
+    let coreDataStack: CoreDataStackProtocol
 
-    init(coreDataStack: CoreDataStack) {
+    init(coreDataStack: CoreDataStackProtocol) {
         self.coreDataStack = coreDataStack
     }
 }
