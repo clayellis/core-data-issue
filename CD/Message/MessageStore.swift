@@ -10,16 +10,18 @@ import Foundation
 import CoreData
 
 class MessageStore: Store {
-    func store(message: Message) {
-        store(messages: [message])
+    func store(_ message: Message) {
+        store([message])
     }
 
-    func store(messages: [Message]) {
+    func store(_ messages: [Message]) {
         coreDataStack.performBackgroundTask { context in
+            // 1. Insert
             for message in messages {
                 MessageData(message: message, context: context)
             }
 
+            // 2. Save
             do {
                 print("MessageStore save")
                 try context.save()
@@ -27,10 +29,11 @@ class MessageStore: Store {
                 print(error.humanReadableString)
             }
 
+            
             for message in messages {
+                // 3. Fetch conversation
                 // If the message belongs to a conversation, and is more recent, update the conversation
-                let request: NSFetchRequest<ConversationData> = ConversationData.fetchRequest()
-                request.predicate = NSPredicate(format: "messageListID == %@", message.messageListID)
+                let request = ConversationData.fetchRequest(withPredicate: "messageListID == %@", argumentArray: [message.messageListID])
                 let results = try! context.fetch(request)
 
                 guard let conversation = results.first else {
@@ -39,17 +42,19 @@ class MessageStore: Store {
 
                 print("MessageStore found conversation for message: \(message)")
 
-                let messageRequest: NSFetchRequest<MessageData> = MessageData.fetchRequest()
-                messageRequest.predicate = NSPredicate(format: "id == %@", message.id)
+                // 4. Fetch message
+                let messageRequest = MessageData.fetchRequest(withPredicate: "id == %@", argumentArray: [message.id])
                 guard let messageResults = try? context.fetch(messageRequest), let messageData = messageResults.first else {
                     fatalError("Missing message")
                 }
 
+                // 5. Update relationship
                 if message.timestamp > conversation.mostRecentMessage!.timestamp as Date! {
                     conversation.mostRecentMessage = messageData
                 }
             }
 
+            // 6. Save
             do {
                 print("MessageStore save")
                 try context.save()
