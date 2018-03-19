@@ -22,8 +22,9 @@ class CDTests: XCTestCase {
     override func setUp() {
         super.setUp()
         createStoreDirectory()
-//        coreDataStack = ContainerStack(modelName: "CD", url: testStoreURL)
-        coreDataStack = ContextualStack(modelName: "CD", url: testStoreURL, type: NSInMemoryStoreType)
+        let type = NSInMemoryStoreType
+//        coreDataStack = ContainerStack(modelName: "CD", url: testStoreURL, type: type)
+        coreDataStack = ContextualStack(modelName: "CD", url: testStoreURL, type: type)
         contactStore = ContactStore(coreDataStack: coreDataStack)
         messageStore = MessageStore(coreDataStack: coreDataStack)
         conversationStore = ConversationStore(coreDataStack: coreDataStack)
