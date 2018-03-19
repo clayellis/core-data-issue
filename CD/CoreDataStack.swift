@@ -22,75 +22,11 @@ protocol CoreDataStackProtocol {
     func close()
 }
 
-class ContainerStack: CoreDataStackProtocol {
-
-    private var container: NSPersistentContainer!
-    var viewContext: NSManagedObjectContext {
-        return container.viewContext
-    }
-
-    var backgroundContext: NSManagedObjectContext {
-        let context = container.newBackgroundContext()
-        configure(context: context)
-        return context
-    }
-
-    required init(modelName: String, url: URL? = nil, type: String) {
-        let description = NSPersistentStoreDescription()
-        description.shouldAddStoreAsynchronously = true
-        description.url = url
-        description.type = type
-
-        container = NSPersistentContainer(name: modelName)
-        container.persistentStoreDescriptions = [description]
-    }
-
-    func loadStore(_ completion: @escaping (Error?) -> Void) {
-        container.loadPersistentStores { description, error in
-            guard error == nil else {
-                completion(error)
-                return
-            }
-
-            print("Persistent Store: \(description)")
-            self.configure(context: self.container.viewContext)
-            completion(nil)
-        }
-    }
-
-    func performBackgroundTask(_ task: @escaping (NSManagedObjectContext) -> Void) {
-        let context = container.newBackgroundContext()
-        configure(context: context)
-        context.performAndWait {
-            task(context)
-        }
-    }
-
-    private func configure(context: NSManagedObjectContext) {
-        context.automaticallyMergesChangesFromParent = true
-        context.mergePolicy = mergePolicy
-    }
-
-    func close() {
-        for store in container.persistentStoreCoordinator.persistentStores {
-            guard let url = store.url else {
-                continue
-            }
-            do {
-                try container.persistentStoreCoordinator.destroyPersistentStore(at: url, ofType: store.type, options: nil)
-            } catch {
-                print(error.humanReadableString)
-            }
-        }
-    }
-}
-
-class ContextualStack: CoreDataStackProtocol {
+class CoreDataStack: CoreDataStackProtocol {
 
     private let coordinator: NSPersistentStoreCoordinator
     private let _storeContext: NSManagedObjectContext
     private let _viewContext: NSManagedObjectContext
-    private let _backgroundContext: NSManagedObjectContext
 
     var viewContext: NSManagedObjectContext {
         return _viewContext
@@ -98,7 +34,6 @@ class ContextualStack: CoreDataStackProtocol {
 
     var backgroundContext: NSManagedObjectContext {
         return newBackgroundContext()
-//        return _backgroundContext
     }
 
     required init(modelName: String, url: URL? = nil, type: String) {
@@ -120,10 +55,6 @@ class ContextualStack: CoreDataStackProtocol {
         _viewContext = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
         _viewContext.parent = _storeContext
         _viewContext.mergePolicy = _storeContext.mergePolicy
-
-        _backgroundContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        _backgroundContext.parent = _viewContext
-        _backgroundContext.mergePolicy = _viewContext.mergePolicy
     }
 
     func loadStore(_ completion: @escaping (Error?) -> Void) {
