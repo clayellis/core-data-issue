@@ -9,7 +9,46 @@
 import Foundation
 import CoreData
 
-class ContactStore: Store {
+protocol ContactStoreProtocol {
+    func store(_ contact: Contact)
+    func store(_ contacts: [Contact])
+}
+
+class ContactStoreUpdateStrategy: Store, ContactStoreProtocol {
+    func store(_ contact: Contact) {
+        print("Storing: \(contact)")
+        store([contact])
+    }
+
+    func store(_ contacts: [Contact]) {
+        coreDataStack.performBackgroundTask { context in
+            for contact in contacts {
+                do {
+                    // 1. Fetch or Create
+                    let request: NSFetchRequest<ContactData> = ContactData.fetchRequest()
+                    request.predicate = NSPredicate(format: "id == %@", contact.id)
+                    let result = try context.fetch(request).first
+                    let contactData = result ?? ContactData(context: context)
+
+                    // 2. Update
+                    contactData.configure(with: contact)
+                } catch {
+                    print("ContactStore error: \(error.humanReadableString)")
+                    continue
+                }
+            }
+
+            // 3. Save
+            do {
+                try context.save()
+            } catch {
+                print(error.humanReadableString)
+            }
+        }
+    }
+}
+
+class ContactStore: Store, ContactStoreProtocol {
     func store(_ contact: Contact) {
         store([contact])
     }
@@ -32,7 +71,8 @@ class ContactStore: Store {
             for contact in contacts {
                 // 3. Fetch conversation
                 // If the contact is part of a conversation, update the conversation
-                let request = ConversationData.fetchRequest(withPredicate: "contact.id == %@", argumentArray: [contact.id])
+                let request: NSFetchRequest<ConversationData> = ConversationData.fetchRequest()
+                request.predicate = NSPredicate(format: "contact.id == %@", contact.id)
                 let results = try! context.fetch(request)
 
                 guard let conversation = results.first else {
@@ -42,7 +82,8 @@ class ContactStore: Store {
                 print("ContactStore found conversation for contact: \(contact)")
 
                 // 4. Fetch contact
-                let contactRequest = ContactData.fetchRequest(withPredicate: "id == %@", argumentArray: [contact.id])
+                let contactRequest: NSFetchRequest<ContactData> = ContactData.fetchRequest()
+                contactRequest.predicate = NSPredicate(format: "id == %@", contact.id)
                 guard let contactResults = try? context.fetch(contactRequest), let contactData = contactResults.first else {
                     fatalError("Missing contact")
                 }

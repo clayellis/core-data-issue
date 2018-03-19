@@ -9,7 +9,58 @@
 import Foundation
 import CoreData
 
-class MessageStore: Store {
+protocol MessageStoreProtocol {
+    func store(_ message: Message)
+    func store(_ messages: [Message])
+}
+
+class MessageStoreUpdateStrategy: Store, MessageStoreProtocol {
+    func store(_ message: Message) {
+        print("Storing: \(message)")
+        store([message])
+    }
+
+    func store(_ messages: [Message]) {
+        coreDataStack.performBackgroundTask { context in
+            for message in messages {
+                do {
+                    // 1. Fetch or Create
+                    let messageRequest: NSFetchRequest<MessageData> = MessageData.fetchRequest()
+                    messageRequest.predicate = NSPredicate(format: "id == %@", message.id)
+                    let messageData = try context.fetch(messageRequest).first ?? MessageData(context: context)
+
+                    // 2. Update
+                    messageData.configure(with: message)
+
+                    // 3. If the message is part of a conversation...
+                    let conversationRequest: NSFetchRequest<ConversationData> = ConversationData.fetchRequest()
+                    conversationRequest.predicate = NSPredicate(format: "messageListID == %@", message.messageListID)
+
+                    guard let conversationData = try context.fetch(conversationRequest).first else {
+                        continue
+                    }
+
+                    // ... and it is more recent, update the conversation.
+                    if message.timestamp > conversationData.mostRecentMessage!.timestamp as Date! {
+                        conversationData.mostRecentMessage = messageData
+                    }
+                } catch {
+                    print("MessageStore error: \(error.humanReadableString)")
+                    continue
+                }
+            }
+
+            // 3. Save
+            do {
+                try context.save()
+            } catch {
+                print(error.humanReadableString)
+            }
+        }
+    }
+}
+
+class MessageStore: Store, MessageStoreProtocol {
     func store(_ message: Message) {
         store([message])
     }
@@ -33,7 +84,8 @@ class MessageStore: Store {
             for message in messages {
                 // 3. Fetch conversation
                 // If the message belongs to a conversation, and is more recent, update the conversation
-                let request = ConversationData.fetchRequest(withPredicate: "messageListID == %@", argumentArray: [message.messageListID])
+                let request: NSFetchRequest<ConversationData> = ConversationData.fetchRequest()
+                request.predicate = NSPredicate(format: "messageListID == %@", message.messageListID)
                 let results = try! context.fetch(request)
 
                 guard let conversation = results.first else {
@@ -43,7 +95,8 @@ class MessageStore: Store {
                 print("MessageStore found conversation for message: \(message)")
 
                 // 4. Fetch message
-                let messageRequest = MessageData.fetchRequest(withPredicate: "id == %@", argumentArray: [message.id])
+                let messageRequest: NSFetchRequest<MessageData> = MessageData.fetchRequest()
+                messageRequest.predicate = NSPredicate(format: "id == %@", message.id)
                 guard let messageResults = try? context.fetch(messageRequest), let messageData = messageResults.first else {
                     fatalError("Missing message")
                 }
