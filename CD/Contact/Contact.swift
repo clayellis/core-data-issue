@@ -18,7 +18,7 @@ extension Contact: Fetchable {
     typealias ResultType = ContactData
 
     var fetchableID: String {
-        return name
+        return id
     }
 
     var fetchRequest: NSFetchRequest<ContactData> {
