@@ -21,16 +21,13 @@ extension ContactStoreProtocol {
     }
 }
 
-class ContactStoreUpdateStrategy: Store, ContactStoreProtocol {
+class ContactStore: Store, ContactStoreProtocol {
     func store(_ contacts: [Contact]) {
         coreDataStack.performBackgroundTask { context in
             for contact in contacts {
                 do {
                     // 1. Fetch or Create
-                    let request: NSFetchRequest<ContactData> = ContactData.fetchRequest()
-                    request.predicate = NSPredicate(format: "id == %@", contact.id)
-                    let result = try context.fetch(request).first
-                    let contactData = result ?? ContactData(context: context)
+                    let contactData = try context.fetch(contact) ?? ContactData(context: context)
 
                     // 2. Update
                     contactData.configure(with: contact)
@@ -41,53 +38,6 @@ class ContactStoreUpdateStrategy: Store, ContactStoreProtocol {
             }
 
             // 3. Save
-            do {
-                try context.save()
-            } catch {
-                print(error.humanReadableString)
-            }
-        }
-    }
-}
-
-class ContactStore: Store, ContactStoreProtocol {
-    func store(_ contacts: [Contact]) {
-        coreDataStack.performBackgroundTask { context in
-            // 1. Insert
-            for contact in contacts {
-                ContactData(contact: contact, context: context)
-            }
-
-            // 2. Save
-            do {
-                try context.save()
-            } catch {
-                print(error.humanReadableString)
-            }
-
-            for contact in contacts {
-                // 3. Fetch conversation
-                // If the contact is part of a conversation, update the conversation
-                let request: NSFetchRequest<ConversationData> = ConversationData.fetchRequest()
-                request.predicate = NSPredicate(format: "contact.id == %@", contact.id)
-                let results = try! context.fetch(request)
-
-                guard let conversation = results.first else {
-                    continue
-                }
-
-                // 4. Fetch contact
-                let contactRequest: NSFetchRequest<ContactData> = ContactData.fetchRequest()
-                contactRequest.predicate = NSPredicate(format: "id == %@", contact.id)
-                guard let contactResults = try? context.fetch(contactRequest), let contactData = contactResults.first else {
-                    fatalError("Missing contact")
-                }
-
-                // 5. Update relationship
-                conversation.contact = contactData
-            }
-
-            // 6. Save
             do {
                 try context.save()
             } catch {
