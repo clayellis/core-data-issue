@@ -7,10 +7,23 @@
 //
 
 import Foundation
+import CoreData
 
 struct Message {
     let id: String
     let messageListID: String
     let body: String
     let timestamp: Date
+}
+
+extension Message: Fetchable {
+    typealias ResultType = MessageData
+
+    var fetchableID: String {
+        return id
+    }
+
+    var fetchRequest: NSFetchRequest<MessageData> {
+        return MessageData.fetchRequest(for: self)
+    }
 }

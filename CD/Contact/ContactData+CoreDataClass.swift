@@ -11,7 +11,7 @@ import Foundation
 import CoreData
 
 @objc(ContactData)
-public class ContactData: NSManagedObject {
+public final class ContactData: NSManagedObject {
     @discardableResult
     convenience init(contact: Contact, context: NSManagedObjectContext) {
         self.init(context: context)
@@ -21,5 +21,13 @@ public class ContactData: NSManagedObject {
     func configure(with contact: Contact) {
         id = contact.id
         name = contact.name
+    }
+}
+
+extension ContactData: FetchRequestable {
+    typealias FetchableType = Contact
+
+    static var fetchID: String {
+        return "id"
     }
 }

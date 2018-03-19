@@ -11,7 +11,7 @@ import Foundation
 import CoreData
 
 @objc(MessageData)
-public class MessageData: NSManagedObject {
+public final class MessageData: NSManagedObject {
     @discardableResult
     convenience init(message: Message, context: NSManagedObjectContext) {
         self.init(context: context)
@@ -23,5 +23,13 @@ public class MessageData: NSManagedObject {
         messageListID = message.messageListID
         body = message.body
         timestamp = message.timestamp as NSDate
+    }
+}
+
+extension MessageData: FetchRequestable {
+    typealias FetchableType = Message
+
+    static var fetchID: String {
+        return "id"
     }
 }

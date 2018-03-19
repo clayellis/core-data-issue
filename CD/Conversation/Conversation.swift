@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CoreData
 
 struct Conversation {
     let contact: Contact
@@ -14,5 +15,17 @@ struct Conversation {
 
     var messageListID: String {
         return mostRecentMessage.messageListID
+    }
+}
+
+extension Conversation: Fetchable {
+    typealias ResultType = ConversationData
+
+    var fetchableID: String {
+        return messageListID
+    }
+
+    var fetchRequest: NSFetchRequest<ConversationData> {
+        return ConversationData.fetchRequest(for: self)
     }
 }

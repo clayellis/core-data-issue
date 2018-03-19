@@ -11,7 +11,8 @@ import Foundation
 import CoreData
 
 @objc(ConversationData)
-public class ConversationData: NSManagedObject {
+public final class ConversationData: NSManagedObject {
+
     @discardableResult
     convenience init(conversation: Conversation, context: NSManagedObjectContext) {
         self.init(context: context)
@@ -32,8 +33,7 @@ public class ConversationData: NSManagedObject {
             if conversation.mostRecentMessage.id != message.id {
                 do {
                     // 1. Fetch or create
-                    let request: NSFetchRequest<MessageData> = MessageData.fetchRequest()
-                    request.predicate = NSPredicate(format: "id == %@", conversation.mostRecentMessage.id)
+                    let request = MessageData.fetchRequest(by: conversation.mostRecentMessage.id)
                     let messageData = try context.fetch(request).first ?? MessageData(context: context)
 
                     // 2. Update
@@ -51,5 +51,13 @@ public class ConversationData: NSManagedObject {
             mostRecentMessage = MessageData(context: context)
             mostRecentMessage?.configure(with: conversation.mostRecentMessage)
         }
+    }
+}
+
+extension ConversationData: FetchRequestable {
+    typealias FetchableType = Conversation
+
+    static var fetchID: String {
+        return "messageListID"
     }
 }
