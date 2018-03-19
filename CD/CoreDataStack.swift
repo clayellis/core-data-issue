@@ -9,6 +9,10 @@
 import Foundation
 import CoreData
 
+private let mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+//private let mergePolicy = NSOverwriteMergePolicy
+//private let mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+
 protocol CoreDataStackProtocol {
     init(modelName: String, url: URL?, type: String)
     var viewContext: NSManagedObjectContext { get }
@@ -60,17 +64,11 @@ class ContainerStack: CoreDataStackProtocol {
         context.performAndWait {
             task(context)
         }
-//        container.performBackgroundTask { context in
-//            self.configure(context: context)
-//            task(context)
-//        }
     }
 
     private func configure(context: NSManagedObjectContext) {
         context.automaticallyMergesChangesFromParent = true
-//        context.mergePolicy = NSMergeByPropertyStoreTrumpMergePolicy
-//        context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
-        context.mergePolicy = NSOverwriteMergePolicy
+        context.mergePolicy = mergePolicy
     }
 
     func close() {
@@ -117,9 +115,7 @@ class ContextualStack: CoreDataStackProtocol {
 
         _storeContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         _storeContext.persistentStoreCoordinator = coordinator
-        _storeContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
-//        _storeContext.mergePolicy = NSOverwriteMergePolicy
-//        _storeContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+        _storeContext.mergePolicy = mergePolicy
 
         _viewContext = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
         _viewContext.parent = _storeContext
