@@ -1,3 +1,5 @@
+*In hindsight, I think I was just using Core Data incorrectly. Though, the documentation did have some ambiguous language that led me to believe that it *could* work that way. Lesson learned!*
+
 #  Notes
 
 The issue that I'm seeing is that Core Data fails to insert a new instance of a unique (constrained) object and update a relationship using the new object in the same `save` operation.
