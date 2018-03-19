@@ -18,15 +18,11 @@ It should be reasonable to expect Core Data to apply the correct merge policy an
 1. The new instance is stored and updated. (***Expected***)
 2. The relationship between the source and destination object is broken. (***Unexpected***)
 
-### The current workaround is:
-1. Insert a new instance of a unique object.
-2. Save the context. (Applies merge policy).
-3. Fetch the newly inserted object.
-4. Fetch the source object that new object is related to (as a destination).
-5. Establish the relationship between the new fetched object (destination) and the fetched object (source).
-6. Save the context.
-
-**The workaround produces the expected outcome.** But it is not ideal because of the intermediate save and fetch steps.
+### The work-around solution is:
+1. Fetch the object (if it doesn't exist, insert a new instance) (this is the destination object)
+2. Fetch the source object the
+3. Update the destination object and the relationship between source and destination
+4. Save the context.
 
 # Demonstration Model
 
