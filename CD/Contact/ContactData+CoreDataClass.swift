@@ -15,6 +15,10 @@ public class ContactData: NSManagedObject {
     @discardableResult
     convenience init(contact: Contact, context: NSManagedObjectContext) {
         self.init(context: context)
+        configure(with: contact)
+    }
+
+    func configure(with contact: Contact) {
         id = contact.id
         name = contact.name
     }

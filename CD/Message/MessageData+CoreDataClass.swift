@@ -15,6 +15,10 @@ public class MessageData: NSManagedObject {
     @discardableResult
     convenience init(message: Message, context: NSManagedObjectContext) {
         self.init(context: context)
+        configure(with: message)
+    }
+
+    func configure(with message: Message) {
         id = message.id
         messageListID = message.messageListID
         body = message.body
