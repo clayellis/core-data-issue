@@ -20,7 +20,7 @@ class Runner {
     init() {
         resetStore()
         let type = NSSQLiteStoreType
-        coreDataStack = ContextualStack(modelName: "CD", url: url, type: type)
+        coreDataStack = CoreDataStack(modelName: "CD", url: url, type: type)
         coreDataStack.loadStore { error in
             if let error = error {
                 fatalError("Failed to load store: \(error)")
