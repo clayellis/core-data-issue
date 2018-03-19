@@ -22,9 +22,8 @@ class CDTests: XCTestCase {
     override func setUp() {
         super.setUp()
         createStoreDirectory()
-        let type = NSInMemoryStoreType
-//        coreDataStack = ContainerStack(modelName: "CD", url: testStoreURL, type: type)
-        coreDataStack = ContextualStack(modelName: "CD", url: testStoreURL, type: type)
+        let type = NSSQLiteStoreType
+        coreDataStack = CoreDataStack(modelName: "CD", url: testStoreURL, type: type)
         contactStore = ContactStore(coreDataStack: coreDataStack)
         messageStore = MessageStore(coreDataStack: coreDataStack)
         conversationStore = ConversationStore(coreDataStack: coreDataStack)
@@ -56,6 +55,7 @@ class CDTests: XCTestCase {
     // MARK: By ID
 
     private func fetchContact(withID id: String) throws -> ContactData? {
+
         let request: NSFetchRequest<ContactData> = ContactData.fetchRequest()
         request.predicate = NSPredicate(format: "id == %@", id)
         return try coreDataStack.viewContext.fetch(request).first
@@ -110,7 +110,7 @@ class CDTests: XCTestCase {
         let expectation = XCTestExpectation(description: "asynchronous test ran")
         coreDataStack.loadStore { error in
             if let error = error {
-                XCTAssertNil(error)
+                XCTFail("Error loading store: \(error.humanReadableString)")
                 return
             }
 
