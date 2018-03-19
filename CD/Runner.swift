@@ -13,19 +13,14 @@ class Runner {
     var coreDataStack: CoreDataStackProtocol!
     let url = URL(fileURLWithPath: "/Users/clay/Desktop/CD/CD.sqlite")
 
-    lazy var contactStore = ContactStoreUpdateStrategy(coreDataStack: coreDataStack)
-    lazy var messageStore = MessageStoreUpdateStrategy(coreDataStack: coreDataStack)
-    lazy var conversationStore = ConversationStoreUpdateStrategy(coreDataStack: coreDataStack)
-
-//    lazy var contactStore = ContactStore(coreDataStack: coreDataStack)
-//    lazy var messageStore = MessageStore(coreDataStack: coreDataStack)
-//    lazy var conversationStore = ConversationStore(coreDataStack: coreDataStack)
+    lazy var contactStore = ContactStore(coreDataStack: coreDataStack)
+    lazy var messageStore = MessageStore(coreDataStack: coreDataStack)
+    lazy var conversationStore = ConversationStore(coreDataStack: coreDataStack)
 
     init() {
         resetStore()
         let type = NSSQLiteStoreType
         coreDataStack = ContextualStack(modelName: "CD", url: url, type: type)
-//        coreDataStack = ContainerStack(modelName: "CD", url: url, type: type)
         coreDataStack.loadStore { error in
             if let error = error {
                 fatalError("Failed to load store: \(error)")
