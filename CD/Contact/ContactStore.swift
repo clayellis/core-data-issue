@@ -14,12 +14,14 @@ protocol ContactStoreProtocol {
     func store(_ contacts: [Contact])
 }
 
-class ContactStoreUpdateStrategy: Store, ContactStoreProtocol {
+extension ContactStoreProtocol {
     func store(_ contact: Contact) {
         print("Storing: \(contact)")
         store([contact])
     }
+}
 
+class ContactStoreUpdateStrategy: Store, ContactStoreProtocol {
     func store(_ contacts: [Contact]) {
         coreDataStack.performBackgroundTask { context in
             for contact in contacts {
@@ -49,10 +51,6 @@ class ContactStoreUpdateStrategy: Store, ContactStoreProtocol {
 }
 
 class ContactStore: Store, ContactStoreProtocol {
-    func store(_ contact: Contact) {
-        store([contact])
-    }
-
     func store(_ contacts: [Contact]) {
         coreDataStack.performBackgroundTask { context in
             // 1. Insert
@@ -62,7 +60,6 @@ class ContactStore: Store, ContactStoreProtocol {
 
             // 2. Save
             do {
-                print("ContactStore save")
                 try context.save()
             } catch {
                 print(error.humanReadableString)
@@ -79,8 +76,6 @@ class ContactStore: Store, ContactStoreProtocol {
                     continue
                 }
 
-                print("ContactStore found conversation for contact: \(contact)")
-
                 // 4. Fetch contact
                 let contactRequest: NSFetchRequest<ContactData> = ContactData.fetchRequest()
                 contactRequest.predicate = NSPredicate(format: "id == %@", contact.id)
@@ -94,7 +89,6 @@ class ContactStore: Store, ContactStoreProtocol {
 
             // 6. Save
             do {
-                print("ContactStore save")
                 try context.save()
             } catch {
                 print(error.humanReadableString)

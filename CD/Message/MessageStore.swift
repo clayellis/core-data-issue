@@ -14,12 +14,14 @@ protocol MessageStoreProtocol {
     func store(_ messages: [Message])
 }
 
-class MessageStoreUpdateStrategy: Store, MessageStoreProtocol {
+extension MessageStoreProtocol {
     func store(_ message: Message) {
         print("Storing: \(message)")
         store([message])
     }
+}
 
+class MessageStoreUpdateStrategy: Store, MessageStoreProtocol {
     func store(_ messages: [Message]) {
         coreDataStack.performBackgroundTask { context in
             for message in messages {
@@ -61,10 +63,6 @@ class MessageStoreUpdateStrategy: Store, MessageStoreProtocol {
 }
 
 class MessageStore: Store, MessageStoreProtocol {
-    func store(_ message: Message) {
-        store([message])
-    }
-
     func store(_ messages: [Message]) {
         coreDataStack.performBackgroundTask { context in
             // 1. Insert
@@ -74,7 +72,6 @@ class MessageStore: Store, MessageStoreProtocol {
 
             // 2. Save
             do {
-                print("MessageStore save")
                 try context.save()
             } catch {
                 print(error.humanReadableString)
@@ -92,8 +89,6 @@ class MessageStore: Store, MessageStoreProtocol {
                     continue
                 }
 
-                print("MessageStore found conversation for message: \(message)")
-
                 // 4. Fetch message
                 let messageRequest: NSFetchRequest<MessageData> = MessageData.fetchRequest()
                 messageRequest.predicate = NSPredicate(format: "id == %@", message.id)
@@ -109,7 +104,6 @@ class MessageStore: Store, MessageStoreProtocol {
 
             // 6. Save
             do {
-                print("MessageStore save")
                 try context.save()
             } catch {
                 print(error.humanReadableString)

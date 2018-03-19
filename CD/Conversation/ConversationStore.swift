@@ -14,12 +14,14 @@ protocol ConversationStoreProtocol {
     func store(_ conversations: [Conversation])
 }
 
-class ConversationStoreUpdateStrategy: Store, ConversationStoreProtocol {
+extension ConversationStoreProtocol {
     func store(_ conversation: Conversation) {
         print("Storing: \(conversation)")
         store([conversation])
     }
+}
 
+class ConversationStoreUpdateStrategy: Store, ConversationStoreProtocol {
     func store(_ conversations: [Conversation]) {
         coreDataStack.performBackgroundTask { context in
             for conversation in conversations {
@@ -48,10 +50,6 @@ class ConversationStoreUpdateStrategy: Store, ConversationStoreProtocol {
 }
 
 class ConversationStore: Store, ConversationStoreProtocol {
-    func store(_ conversation: Conversation) {
-        store([conversation])
-    }
-
     func store(_ conversations: [Conversation]) {
         coreDataStack.performBackgroundTask { context in
             // 1. Insert
@@ -62,7 +60,6 @@ class ConversationStore: Store, ConversationStoreProtocol {
 
             // 2. Save
             do {
-                print("ConversationStore save")
                 try context.save()
             } catch {
                 print(error.humanReadableString)
@@ -91,7 +88,6 @@ class ConversationStore: Store, ConversationStoreProtocol {
 
             // 5. Save
             do {
-                print("ConversationStore save")
                 try context.save()
             } catch {
                 print(error.humanReadableString)
