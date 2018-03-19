@@ -52,39 +52,16 @@ class CDTests: XCTestCase {
 
     // MARK: - Fetches
 
-    // MARK: By ID
-
-    private func fetchContact(withID id: String) throws -> ContactData? {
-
-        let request: NSFetchRequest<ContactData> = ContactData.fetchRequest()
-        request.predicate = NSPredicate(format: "id == %@", id)
-        return try coreDataStack.viewContext.fetch(request).first
-    }
-
-    private func fetchMessage(withID id: String) throws -> MessageData? {
-        let request: NSFetchRequest<MessageData> = MessageData.fetchRequest()
-        request.predicate = NSPredicate(format: "id == %@", id)
-        return try coreDataStack.viewContext.fetch(request).first
-    }
-
-    private func fetchConversation(withMessageListID messageListID: String) throws -> ConversationData? {
-        let request: NSFetchRequest<ConversationData> = ConversationData.fetchRequest()
-        request.predicate = NSPredicate(format: "messageListID == %@", messageListID)
-        return try coreDataStack.viewContext.fetch(request).first
-    }
-
-    // MARK: By Object
-
     private func fetch(_ contact: Contact) throws -> ContactData? {
-        return try fetchContact(withID: contact.id)
+        return try coreDataStack.viewContext.fetch(contact)
     }
 
     private func fetch(_ message: Message) throws -> MessageData? {
-        return try fetchMessage(withID: message.id)
+        return try coreDataStack.viewContext.fetch(message)
     }
 
     private func fetch(_ conversation: Conversation) throws -> ConversationData? {
-        return try fetchConversation(withMessageListID: conversation.messageListID)
+        return try coreDataStack.viewContext.fetch(conversation)
     }
 
     // MARK: - Counts
@@ -180,10 +157,10 @@ class CDTests: XCTestCase {
             let updatedContact = Contact(id: id, name: "Updated Name")
             self.contactStore.store(contact)
             XCTAssertEqual(try self.contactsCount(), 1)
-            XCTAssertEqual(try self.fetchContact(withID: id)?.name, contact.name)
+            XCTAssertEqual(try self.fetch(contact)?.name, contact.name)
             self.contactStore.store(updatedContact)
             XCTAssertEqual(try self.contactsCount(), 1)
-            XCTAssertEqual(try self.fetchContact(withID: id)?.name, updatedContact.name)
+            XCTAssertEqual(try self.fetch(updatedContact)?.name, updatedContact.name)
         }
     }
 
@@ -194,10 +171,10 @@ class CDTests: XCTestCase {
             let updatedMessage = Message(id: id, messageListID: message.messageListID, body: "Hello, World.", timestamp: message.timestamp)
             self.messageStore.store(message)
             XCTAssertEqual(try self.messagesCount(), 1)
-            XCTAssertEqual(try self.fetchMessage(withID: id)?.body, message.body)
+            XCTAssertEqual(try self.fetch(message)?.body, message.body)
             self.messageStore.store(updatedMessage)
             XCTAssertEqual(try self.messagesCount(), 1)
-            XCTAssertEqual(try self.fetchMessage(withID: id)?.body, updatedMessage.body)
+            XCTAssertEqual(try self.fetch(updatedMessage)?.body, updatedMessage.body)
         }
     }
 
