@@ -15,9 +15,9 @@ class CDTests: XCTestCase {
     let testDirectoryURL = URL(fileURLWithPath: "/tmp/cd-test/")
     lazy var testStoreURL = testDirectoryURL.appendingPathComponent("Test.sqlite")
     var coreDataStack: CoreDataStackProtocol!
-    var contactStore: ContactStoreProtocol!
-    var messageStore: MessageStoreProtocol!
-    var conversationStore: ConversationStoreProtocol!
+    var contactStore: ContactStore!
+    var messageStore: MessageStore!
+    var conversationStore: ConversationStore!
 
     override func setUp() {
         super.setUp()

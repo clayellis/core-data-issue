@@ -9,22 +9,10 @@
 import Foundation
 import CoreData
 
-protocol ConversationStoreProtocol {
-    func store(_ conversation: Conversation)
-    func store(_ conversations: [Conversation])
-}
-
-extension ConversationStoreProtocol {
-    func store(_ conversation: Conversation) {
-        print("Storing: \(conversation)")
-        store([conversation])
-    }
-}
-
-class ConversationStore: Store, ConversationStoreProtocol {
-    func store(_ conversations: [Conversation]) {
+class ConversationStore: Store<Conversation> {
+    override func store(_ models: [Conversation]) {
         coreDataStack.performBackgroundTask { context in
-            for conversation in conversations {
+            for conversation in models {
                 // 1. Fetch or insert
                 let conversationData = try context.fetchOrInsert(conversation)
 

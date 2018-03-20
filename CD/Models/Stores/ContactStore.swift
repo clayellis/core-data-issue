@@ -9,22 +9,10 @@
 import Foundation
 import CoreData
 
-protocol ContactStoreProtocol {
-    func store(_ contact: Contact)
-    func store(_ contacts: [Contact])
-}
-
-extension ContactStoreProtocol {
-    func store(_ contact: Contact) {
-        print("Storing: \(contact)")
-        store([contact])
-    }
-}
-
-class ContactStore: Store, ContactStoreProtocol {
-    func store(_ contacts: [Contact]) {
+class ContactStore: Store<Contact> {
+    override func store(_ models: [Contact]) {
         coreDataStack.performBackgroundTask { context in
-            for contact in contacts {
+            for contact in models {
                 // 1. Fetch or insert
                 let contactData = try context.fetchOrInsert(contact)
 

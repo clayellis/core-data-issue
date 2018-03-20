@@ -9,22 +9,10 @@
 import Foundation
 import CoreData
 
-protocol MessageStoreProtocol {
-    func store(_ message: Message)
-    func store(_ messages: [Message])
-}
-
-extension MessageStoreProtocol {
-    func store(_ message: Message) {
-        print("Storing: \(message)")
-        store([message])
-    }
-}
-
-class MessageStore: Store, MessageStoreProtocol {
-    func store(_ messages: [Message]) {
+class MessageStore: Store<Message> {
+    override func store(_ models: [Message]) {
         coreDataStack.performBackgroundTask { context in
-            for message in messages {
+            for message in models {
                 // 1. Fetch or insert
                 let messageData = try context.fetchOrInsert(message)
 
