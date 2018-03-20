@@ -36,7 +36,7 @@ class CDTests: XCTestCase {
     }
     
     override func tearDown() {
-        coreDataStack.close()
+        coreDataStack.tearDown()
         coreDataStack = nil
         contactStore = nil
         messageStore = nil
