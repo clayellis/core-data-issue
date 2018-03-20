@@ -16,10 +16,17 @@ struct Message {
     let timestamp: Date
 }
 
-extension Message: Fetchable {
-    typealias FetchedType = MessageData
+extension Message: Model {
+    typealias ModelDataType = MessageData
 
     var fetchableID: String {
         return id
+    }
+
+    init(data: ModelDataType) throws {
+        id = data.id!
+        messageListID = data.messageListID!
+        body = data.body!
+        timestamp = data.timestamp! as Date
     }
 }

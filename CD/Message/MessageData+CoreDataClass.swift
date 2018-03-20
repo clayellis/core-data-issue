@@ -11,25 +11,26 @@ import Foundation
 import CoreData
 
 @objc(MessageData)
-public final class MessageData: NSManagedObject {
-    @discardableResult
-    convenience init(message: Message, context: NSManagedObjectContext) {
-        self.init(context: context)
-        configure(with: message)
+public final class MessageData: NSManagedObject {}
+
+extension MessageData: ModelData {
+    typealias ModelType = Message
+
+    static var fetchID: String {
+        return "id"
     }
 
-    func configure(with message: Message) {
+    @discardableResult
+    convenience init(model: ModelType, context: NSManagedObjectContext) {
+        self.init(context: context)
+        configure(with: model, in: context)
+    }
+
+    func configure(with model: Message, in context: NSManagedObjectContext) {
+        let message = model
         id = message.id
         messageListID = message.messageListID
         body = message.body
         timestamp = message.timestamp as NSDate
-    }
-}
-
-extension MessageData: FetchRequestable {
-    typealias FetchableType = Message
-
-    static var fetchID: String {
-        return "id"
     }
 }

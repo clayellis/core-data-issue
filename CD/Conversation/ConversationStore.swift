@@ -30,7 +30,7 @@ class ConversationStore: Store, ConversationStoreProtocol {
                     let conversationData = try context.fetch(conversation) ?? ConversationData(context: context)
 
                     // 2. Update
-                    conversationData.configure(conversation: conversation, context: context)
+                    conversationData.configure(with: conversation, in: context)
                 } catch {
                     print("ConversationStore error: \(error.humanReadableString)")
                     continue

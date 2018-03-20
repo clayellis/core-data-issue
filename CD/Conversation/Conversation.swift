@@ -18,10 +18,15 @@ struct Conversation {
     }
 }
 
-extension Conversation: Fetchable {
-    typealias FetchedType = ConversationData
+extension Conversation: Model {
+    typealias ModelDataType = ConversationData
 
     var fetchableID: String {
         return messageListID
+    }
+
+    init(data: ModelDataType) throws {
+        contact = try! Contact(data: data.contact!)
+        mostRecentMessage = try! Message(data: data.mostRecentMessage!)
     }
 }

@@ -11,21 +11,29 @@ import Foundation
 import CoreData
 
 @objc(ConversationData)
-public final class ConversationData: NSManagedObject {
+public final class ConversationData: NSManagedObject {}
 
-    @discardableResult
-    convenience init(conversation: Conversation, context: NSManagedObjectContext) {
-        self.init(context: context)
-        configure(conversation: conversation, context: context)
+extension ConversationData: ModelData {
+    typealias ModelType = Conversation
+
+    static var fetchID: String {
+        return "messageListID"
     }
 
-    func configure(conversation: Conversation, context: NSManagedObjectContext) {
+    @discardableResult
+    convenience init(model: ModelType, context: NSManagedObjectContext) {
+        self.init(context: context)
+        configure(with: model, in: context)
+    }
+
+    func configure(with model: Conversation, in context: NSManagedObjectContext) {
+        let conversation = model
         messageListID = conversation.messageListID
 
         if contact == nil {
             contact = ContactData(context: context)
         }
-        contact?.configure(with: conversation.contact)
+        contact?.configure(with: conversation.contact, in: context)
 
         // If a most recent message already exists...
         if let message = mostRecentMessage {
@@ -37,27 +45,19 @@ public final class ConversationData: NSManagedObject {
                     let messageData = try context.fetch(request).first ?? MessageData(context: context)
 
                     // 2. Update
-                    messageData.configure(with: conversation.mostRecentMessage)
+                    messageData.configure(with: conversation.mostRecentMessage, in: context)
                     mostRecentMessage = messageData
                 } catch {
                     print("MessageData fetch failed")
                 }
             } else {
                 // Otherwise, configure the existing message.
-                message.configure(with: conversation.mostRecentMessage)
+                message.configure(with: conversation.mostRecentMessage, in: context)
             }
         } else {
             // Otherwise, create and configure most recent message.
             mostRecentMessage = MessageData(context: context)
-            mostRecentMessage?.configure(with: conversation.mostRecentMessage)
+            mostRecentMessage?.configure(with: conversation.mostRecentMessage, in: context)
         }
-    }
-}
-
-extension ConversationData: FetchRequestable {
-    typealias FetchableType = Conversation
-
-    static var fetchID: String {
-        return "messageListID"
     }
 }

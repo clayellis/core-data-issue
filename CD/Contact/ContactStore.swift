@@ -30,7 +30,7 @@ class ContactStore: Store, ContactStoreProtocol {
                     let contactData = try context.fetch(contact) ?? ContactData(context: context)
 
                     // 2. Update
-                    contactData.configure(with: contact)
+                    contactData.configure(with: contact, in: context)
                 } catch {
                     print("ContactStore error: \(error.humanReadableString)")
                     continue

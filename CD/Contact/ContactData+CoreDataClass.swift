@@ -11,23 +11,24 @@ import Foundation
 import CoreData
 
 @objc(ContactData)
-public final class ContactData: NSManagedObject {
-    @discardableResult
-    convenience init(contact: Contact, context: NSManagedObjectContext) {
-        self.init(context: context)
-        configure(with: contact)
-    }
+public final class ContactData: NSManagedObject {}
 
-    func configure(with contact: Contact) {
-        id = contact.id
-        name = contact.name
-    }
-}
-
-extension ContactData: FetchRequestable {
-    typealias FetchableType = Contact
+extension ContactData: ModelData {
+    typealias ModelType = Contact
 
     static var fetchID: String {
         return "id"
+    }
+
+    @discardableResult
+    convenience init(model: ModelType, context: NSManagedObjectContext) {
+        self.init(context: context)
+        configure(with: model, in: context)
+    }
+
+    func configure(with model: Contact, in context: NSManagedObjectContext) {
+        let contact = model
+        id = contact.id
+        name = contact.name
     }
 }

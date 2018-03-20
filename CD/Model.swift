@@ -1,5 +1,5 @@
 //
-//  Fetchable.swift
+//  Model.swift
 //  CD
 //
 //  Created by Clay Ellis on 3/19/18.
@@ -9,39 +9,43 @@
 import Foundation
 import CoreData
 
-protocol Fetchable {
-    associatedtype FetchedType: NSFetchRequestResult
-    var fetchRequest: NSFetchRequest<FetchedType> { get }
+protocol Model {
+    associatedtype ModelDataType: NSManagedObject
+
+    init(data: ModelDataType) throws
+    var fetchRequest: NSFetchRequest<ModelDataType> { get }
     var fetchableID: String { get }
 }
 
-extension Fetchable where FetchedType: FetchRequestable, FetchedType.FetchableType == Self {
-    var fetchRequest: NSFetchRequest<FetchedType> {
-        return FetchedType.fetchRequest(for: self)
+extension Model where ModelDataType: ModelData, ModelDataType.ModelType == Self {
+    var fetchRequest: NSFetchRequest<ModelDataType> {
+        return ModelDataType.fetchRequest(for: self)
     }
 }
 
 extension NSManagedObjectContext {
-    func fetch<T>(_ fetchable: T) throws -> T.FetchedType? where T: Fetchable {
+    func fetch<T>(_ fetchable: T) throws -> T.ModelDataType? where T: Model {
         let request = fetchable.fetchRequest
         return try fetch(request).first
     }
 }
 
-protocol FetchRequestable: NSFetchRequestResult {
-    associatedtype FetchableType: Fetchable
+protocol ModelData: NSFetchRequestResult {
+    associatedtype ModelType: Model
 
     static var fetchID: String { get }
+    @discardableResult init(model: ModelType, context: NSManagedObjectContext)
+    func configure(with model: ModelType, in context: NSManagedObjectContext)
     static func fetchRequest() -> NSFetchRequest<Self>
     static func fetchRequest(_ predicate: String, _ arguments: String...) -> NSFetchRequest<Self>
     static func fetchRequest(by id: String) -> NSFetchRequest<Self>
-    static func fetchRequest(for object: FetchableType) -> NSFetchRequest<Self>
+    static func fetchRequest(for object: ModelType) -> NSFetchRequest<Self>
 }
 
-extension FetchRequestable {
+extension ModelData {
     typealias Request = NSFetchRequest<Self>
 
-    static func fetchRequest(for object: FetchableType) -> Request {
+    static func fetchRequest(for object: ModelType) -> Request {
         return fetchRequest(by: object.fetchableID)
     }
 

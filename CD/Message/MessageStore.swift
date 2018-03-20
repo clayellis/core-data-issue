@@ -30,7 +30,7 @@ class MessageStore: Store, MessageStoreProtocol {
                     let messageData = try context.fetch(message) ?? MessageData(context: context)
 
                     // 2. Update
-                    messageData.configure(with: message)
+                    messageData.configure(with: message, in: context)
 
                     // 3. If the message is part of a conversation...
                     let conversationRequest = ConversationData.fetchRequest(by: message.messageListID)
