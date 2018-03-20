@@ -46,6 +46,8 @@ class CoreDataStack: CoreDataStackProtocol {
         [storeContext, viewContext].forEach(configure)
     }
 
+    // MARK: - Public
+
     func loadStore(_ completion: @escaping (Error?) -> Void) {
         completion(nil)
     }
@@ -70,6 +72,22 @@ class CoreDataStack: CoreDataStackProtocol {
             }
         }
     }
+
+
+    func close() {
+        for store in coordinator.persistentStores {
+            guard let url = store.url else {
+                continue
+            }
+            do {
+                try coordinator.destroyPersistentStore(at: url, ofType: store.type, options: nil)
+            } catch {
+                print(error.humanReadableString)
+            }
+        }
+    }
+
+    // MARK: - Private
 
     private func configure(_ context: NSManagedObjectContext) {
         context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
@@ -97,19 +115,6 @@ class CoreDataStack: CoreDataStackProtocol {
             } catch {
                 let contextName = self.name(from: context)
                 print("Failed to save \(contextName) context: \(error.humanReadableString)")
-            }
-        }
-    }
-
-    func close() {
-        for store in coordinator.persistentStores {
-            guard let url = store.url else {
-                continue
-            }
-            do {
-                try coordinator.destroyPersistentStore(at: url, ofType: store.type, options: nil)
-            } catch {
-                print(error.humanReadableString)
             }
         }
     }
