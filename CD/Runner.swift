@@ -25,13 +25,8 @@ class Runner {
         } catch {
             fatalError("Failed to initialize CoreDataStack: \(error.humanReadableString)")
         }
-        coreDataStack.loadStore { error in
-            if let error = error {
-                fatalError("Failed to load store: \(error)")
-            }
 
-            self.run()
-        }
+        run()
     }
 
     // MARK: - Private
