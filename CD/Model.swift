@@ -33,7 +33,7 @@ extension NSManagedObjectContext {
 protocol ModelData: NSFetchRequestResult {
     associatedtype ModelType: Model
 
-    static var fetchID: String { get }
+    static var idPropertyName: String { get }
     @discardableResult init(model: ModelType, context: NSManagedObjectContext)
     func configure(with model: ModelType, in context: NSManagedObjectContext)
     static func fetchRequest() -> NSFetchRequest<Self>
@@ -50,7 +50,7 @@ extension ModelData {
     }
 
     static func fetchRequest(by id: String) -> Request {
-        return fetchRequest("\(fetchID) == %@", id)
+        return fetchRequest("\(idPropertyName) == %@", id)
     }
 
     static func fetchRequest(_ predicate: String, _ arguments: String...) -> Request {

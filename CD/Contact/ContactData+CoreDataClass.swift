@@ -16,7 +16,7 @@ public final class ContactData: NSManagedObject {}
 extension ContactData: ModelData {
     typealias ModelType = Contact
 
-    static var fetchID: String {
+    static var idPropertyName: String {
         return "id"
     }
 

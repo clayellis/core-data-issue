@@ -26,11 +26,3 @@ extension Contact: Model {
         name = data.name!
     }
 }
-
-//extension Contact: Model {
-//    typealias ModelDataType = ContactData
-//
-//    var fetchableID: String {
-//        return id
-//    }
-//}

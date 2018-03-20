@@ -16,7 +16,7 @@ public final class ConversationData: NSManagedObject {}
 extension ConversationData: ModelData {
     typealias ModelType = Conversation
 
-    static var fetchID: String {
+    static var idPropertyName: String {
         return "messageListID"
     }
 
