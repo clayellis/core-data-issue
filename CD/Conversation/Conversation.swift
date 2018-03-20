@@ -19,13 +19,9 @@ struct Conversation {
 }
 
 extension Conversation: Fetchable {
-    typealias ResultType = ConversationData
+    typealias FetchedType = ConversationData
 
     var fetchableID: String {
         return messageListID
-    }
-
-    var fetchRequest: NSFetchRequest<ConversationData> {
-        return ConversationData.fetchRequest(for: self)
     }
 }

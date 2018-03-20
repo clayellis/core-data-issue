@@ -17,13 +17,9 @@ struct Message {
 }
 
 extension Message: Fetchable {
-    typealias ResultType = MessageData
+    typealias FetchedType = MessageData
 
     var fetchableID: String {
         return id
-    }
-
-    var fetchRequest: NSFetchRequest<MessageData> {
-        return MessageData.fetchRequest(for: self)
     }
 }

@@ -15,13 +15,9 @@ struct Contact {
 }
 
 extension Contact: Fetchable {
-    typealias ResultType = ContactData
+    typealias FetchedType = ContactData
 
     var fetchableID: String {
         return id
-    }
-
-    var fetchRequest: NSFetchRequest<ContactData> {
-        return ContactData.fetchRequest(for: self)
     }
 }
