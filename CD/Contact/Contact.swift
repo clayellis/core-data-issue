@@ -17,10 +17,6 @@ struct Contact {
 extension Contact: Model {
     typealias ModelDataType = ContactData
 
-    var fetchableID: String {
-        return id
-    }
-
     init(data: ModelDataType) throws {
         id = data.id!
         name = data.name!

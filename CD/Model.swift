@@ -14,7 +14,7 @@ protocol Model {
 
     init(data: ModelDataType) throws
     var fetchRequest: NSFetchRequest<ModelDataType> { get }
-    var fetchableID: String { get }
+    var id: String { get }
 }
 
 extension Model where ModelDataType: ModelData, ModelDataType.ModelType == Self {
@@ -46,7 +46,7 @@ extension ModelData {
     typealias Request = NSFetchRequest<Self>
 
     static func fetchRequest(for object: ModelType) -> Request {
-        return fetchRequest(by: object.fetchableID)
+        return fetchRequest(by: object.id)
     }
 
     static func fetchRequest(by id: String) -> Request {

@@ -19,10 +19,6 @@ struct Message {
 extension Message: Model {
     typealias ModelDataType = MessageData
 
-    var fetchableID: String {
-        return id
-    }
-
     init(data: ModelDataType) throws {
         id = data.id!
         messageListID = data.messageListID!

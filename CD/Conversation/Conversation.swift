@@ -21,7 +21,7 @@ struct Conversation {
 extension Conversation: Model {
     typealias ModelDataType = ConversationData
 
-    var fetchableID: String {
+    var id: String {
         return messageListID
     }
 
