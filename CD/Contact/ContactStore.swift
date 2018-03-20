@@ -25,24 +25,15 @@ class ContactStore: Store, ContactStoreProtocol {
     func store(_ contacts: [Contact]) {
         coreDataStack.performBackgroundTask { context in
             for contact in contacts {
-                do {
-                    // 1. Fetch or Create
-                    let contactData = try context.fetch(contact) ?? ContactData(context: context)
+                // 1. Fetch or insert
+                let contactData = try context.fetchOrInsert(contact)
 
-                    // 2. Update
-                    contactData.configure(with: contact, in: context)
-                } catch {
-                    print("ContactStore error: \(error.humanReadableString)")
-                    continue
-                }
+                // 2. Update
+                contactData.configure(with: contact, in: context)
             }
 
             // 3. Save
-            do {
-                try context.save()
-            } catch {
-                print(error.humanReadableString)
-            }
+            try context.save()
         }
     }
 }

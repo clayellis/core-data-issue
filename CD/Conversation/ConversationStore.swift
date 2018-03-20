@@ -25,24 +25,15 @@ class ConversationStore: Store, ConversationStoreProtocol {
     func store(_ conversations: [Conversation]) {
         coreDataStack.performBackgroundTask { context in
             for conversation in conversations {
-                do {
-                    // 1. Fetch or create
-                    let conversationData = try context.fetch(conversation) ?? ConversationData(context: context)
+                // 1. Fetch or insert
+                let conversationData = try context.fetchOrInsert(conversation)
 
-                    // 2. Update
-                    conversationData.configure(with: conversation, in: context)
-                } catch {
-                    print("ConversationStore error: \(error.humanReadableString)")
-                    continue
-                }
+                // 2. Update
+                conversationData.configure(with: conversation, in: context)
             }
 
             // 3. Save
-            do {
-                try context.save()
-            } catch {
-                print(error.humanReadableString)
-            }
+            try context.save()
         }
     }
 }

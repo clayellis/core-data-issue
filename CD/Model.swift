@@ -28,6 +28,10 @@ extension NSManagedObjectContext {
         let request = fetchable.fetchRequest
         return try fetch(request).first
     }
+
+    func fetchOrInsert<T>(_ fetchable: T) throws -> T.ModelDataType where T: Model {
+        return try fetch(fetchable) ?? T.ModelDataType(context: self)
+    }
 }
 
 protocol ModelData: NSFetchRequestResult {
