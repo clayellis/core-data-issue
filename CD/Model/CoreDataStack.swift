@@ -73,7 +73,6 @@ class CoreDataStack: CoreDataStackProtocol {
         }
     }
 
-
     func close() {
         for store in coordinator.persistentStores {
             guard let url = store.url else {
