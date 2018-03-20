@@ -10,7 +10,7 @@ import Foundation
 import CoreData
 
 protocol CoreDataStackProtocol {
-    init(modelName: String, url: URL?, type: String)
+    init(modelName: String, url: URL?, type: String) throws
     var viewContext: NSManagedObjectContext { get }
     func newBackgroundContext() -> NSManagedObjectContext
     func performBackgroundTask(_ task: @escaping (NSManagedObjectContext) throws -> Void)
@@ -25,13 +25,13 @@ class CoreDataStack: CoreDataStackProtocol {
 
     let viewContext: NSManagedObjectContext
 
-    required init(modelName: String, url: URL? = nil, type: String) {
+    required init(modelName: String, url: URL? = nil, type: String) throws {
         let model = NSManagedObjectModel.mergedModel(from: [.main])!
         coordinator = NSPersistentStoreCoordinator(managedObjectModel: model)
         let options = [NSMigratePersistentStoresAutomaticallyOption: true,
                        NSInferMappingModelAutomaticallyOption: true]
 
-        try! coordinator.addPersistentStore(ofType: type, configurationName: nil, at: url, options: options)
+        try coordinator.addPersistentStore(ofType: type, configurationName: nil, at: url, options: options)
 
         if let storeURL = coordinator.persistentStores.first?.url {
             print("Added store at: \(storeURL)")

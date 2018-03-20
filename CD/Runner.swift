@@ -20,7 +20,11 @@ class Runner {
     init() {
         resetStore()
         let type = NSSQLiteStoreType
-        coreDataStack = CoreDataStack(modelName: "CD", url: url, type: type)
+        do {
+            coreDataStack = try CoreDataStack(modelName: "CD", url: url, type: type)
+        } catch {
+            fatalError("Failed to initialize CoreDataStack: \(error.humanReadableString)")
+        }
         coreDataStack.loadStore { error in
             if let error = error {
                 fatalError("Failed to load store: \(error)")

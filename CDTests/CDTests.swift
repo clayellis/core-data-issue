@@ -23,7 +23,13 @@ class CDTests: XCTestCase {
         super.setUp()
         createStoreDirectory()
         let type = NSSQLiteStoreType
-        coreDataStack = CoreDataStack(modelName: "CD", url: testStoreURL, type: type)
+        do {
+            coreDataStack = try CoreDataStack(modelName: "CD", url: testStoreURL, type: type)
+        } catch {
+            XCTFail("Failed to initialize CoreDataStack: \(error.humanReadableString)")
+            tearDown()
+            return
+        }
         contactStore = ContactStore(coreDataStack: coreDataStack)
         messageStore = MessageStore(coreDataStack: coreDataStack)
         conversationStore = ConversationStore(coreDataStack: coreDataStack)
