@@ -90,14 +90,14 @@ class CDTests: XCTestCase {
     // MARK: - Tests
 
     func testStackStartsEmpty() {
-        let objectCount = self.coreDataStack.viewContext.registeredObjects.count
+        let objectCount = coreDataStack.viewContext.registeredObjects.count
         XCTAssertEqual(objectCount, 0)
     }
 
     func testStoreContact() throws {
         let contact = Contact(id: "contact.1", name: "Name")
-        self.contactStore.store(contact)
-        let fetched = try self.fetch(contact)
+        contactStore.store(contact)
+        let fetched = try fetch(contact)
         XCTAssertNotNil(fetched)
         XCTAssertEqual(fetched?.id, contact.id)
         XCTAssertEqual(fetched?.name, contact.name)
@@ -105,8 +105,8 @@ class CDTests: XCTestCase {
 
     func testStoreMessage() throws {
         let message = Message(id: "message.1", messageListID: "list.1", body: "Body", timestamp: Date())
-        self.messageStore.store(message)
-        let fetched = try self.fetch(message)
+        messageStore.store(message)
+        let fetched = try fetch(message)
         XCTAssertNotNil(fetched)
         XCTAssertEqual(fetched?.id, message.id)
         XCTAssertEqual(fetched?.messageListID, message.messageListID)
@@ -118,38 +118,38 @@ class CDTests: XCTestCase {
         let contact = Contact(id: "contact.1", name: "Name")
         let message = Message(id: "message.1", messageListID: "list.1", body: "Body", timestamp: Date())
         let conversation = Conversation(contact: contact, mostRecentMessage: message)
-        self.conversationStore.store(conversation)
-        let fetched = try self.fetch(conversation)
+        conversationStore.store(conversation)
+        let fetched = try fetch(conversation)
         XCTAssertNotNil(fetched)
         XCTAssertEqual(fetched?.messageListID, conversation.messageListID)
         XCTAssertEqual(fetched?.contact?.id, conversation.contact.id)
         XCTAssertEqual(fetched?.mostRecentMessage?.id, conversation.mostRecentMessage.id)
-        XCTAssertEqual(try self.fetch(message)?.conversation?.messageListID, conversation.messageListID)
-        XCTAssertEqual(try self.fetch(contact)?.conversation?.messageListID, conversation.messageListID)
+        XCTAssertEqual(try fetch(message)?.conversation?.messageListID, conversation.messageListID)
+        XCTAssertEqual(try fetch(contact)?.conversation?.messageListID, conversation.messageListID)
     }
 
     func testUniqueContacts() throws {
         let id = "contact.1"
         let contact = Contact(id: id, name: "Name")
         let updatedContact = Contact(id: id, name: "Updated Name")
-        self.contactStore.store(contact)
-        XCTAssertEqual(try self.contactsCount(), 1)
-        XCTAssertEqual(try self.fetch(contact)?.name, contact.name)
-        self.contactStore.store(updatedContact)
-        XCTAssertEqual(try self.contactsCount(), 1)
-        XCTAssertEqual(try self.fetch(updatedContact)?.name, updatedContact.name)
+        contactStore.store(contact)
+        XCTAssertEqual(try contactsCount(), 1)
+        XCTAssertEqual(try fetch(contact)?.name, contact.name)
+        contactStore.store(updatedContact)
+        XCTAssertEqual(try contactsCount(), 1)
+        XCTAssertEqual(try fetch(updatedContact)?.name, updatedContact.name)
     }
 
     func testUniqueMessages() throws {
         let id = "messsage.1"
         let message = Message(id: id, messageListID: "list.1", body: "Hello", timestamp: Date())
         let updatedMessage = Message(id: id, messageListID: message.messageListID, body: "Hello, World.", timestamp: message.timestamp)
-        self.messageStore.store(message)
-        XCTAssertEqual(try self.messagesCount(), 1)
-        XCTAssertEqual(try self.fetch(message)?.body, message.body)
-        self.messageStore.store(updatedMessage)
-        XCTAssertEqual(try self.messagesCount(), 1)
-        XCTAssertEqual(try self.fetch(updatedMessage)?.body, updatedMessage.body)
+        messageStore.store(message)
+        XCTAssertEqual(try messagesCount(), 1)
+        XCTAssertEqual(try fetch(message)?.body, message.body)
+        messageStore.store(updatedMessage)
+        XCTAssertEqual(try messagesCount(), 1)
+        XCTAssertEqual(try fetch(updatedMessage)?.body, updatedMessage.body)
     }
 
     func testUniqueConversations() throws {
@@ -157,14 +157,14 @@ class CDTests: XCTestCase {
         let contact = Contact(id: "contact.1", name: "Name")
         let message = Message(id: "message.1", messageListID: listID, body: "Body", timestamp: Date())
         let conversation = Conversation(contact: contact, mostRecentMessage: message)
-        self.conversationStore.store(conversation)
-        XCTAssertEqual(try self.conversationsCount(), 1)
-        XCTAssertEqual(try self.fetch(conversation)?.mostRecentMessage?.id, message.id)
+        conversationStore.store(conversation)
+        XCTAssertEqual(try conversationsCount(), 1)
+        XCTAssertEqual(try fetch(conversation)?.mostRecentMessage?.id, message.id)
         let newMessage = Message(id: "message.2", messageListID: listID, body: "New", timestamp: Date())
         let updatedConversation = Conversation(contact: contact, mostRecentMessage: newMessage)
-        self.conversationStore.store(updatedConversation)
-        XCTAssertEqual(try self.conversationsCount(), 1)
-        XCTAssertEqual(try self.fetch(conversation)?.mostRecentMessage?.id, newMessage.id)
+        conversationStore.store(updatedConversation)
+        XCTAssertEqual(try conversationsCount(), 1)
+        XCTAssertEqual(try fetch(conversation)?.mostRecentMessage?.id, newMessage.id)
     }
 
     // Store: Conversation, Contact, Message (relationships should be established/stable after all three)
@@ -174,34 +174,34 @@ class CDTests: XCTestCase {
         let conversation = Conversation(contact: contact, mostRecentMessage: message)
 
         // Store the conversation
-        self.conversationStore.store(conversation)
+        conversationStore.store(conversation)
 
         // The contact, message, and conversation should be stored (and there should be one of each)
-        XCTAssertEqual(try self.contactsCount(), 1)
-        XCTAssertEqual(try self.messagesCount(), 1)
-        XCTAssertEqual(try self.conversationsCount(), 1)
+        XCTAssertEqual(try contactsCount(), 1)
+        XCTAssertEqual(try messagesCount(), 1)
+        XCTAssertEqual(try conversationsCount(), 1)
 
         // And the conversation should point to the contact and the message
-        XCTAssertEqual(try self.fetch(conversation)?.contact?.id, contact.id)
-        XCTAssertEqual(try self.fetch(conversation)?.mostRecentMessage?.id, message.id)
+        XCTAssertEqual(try fetch(conversation)?.contact?.id, contact.id)
+        XCTAssertEqual(try fetch(conversation)?.mostRecentMessage?.id, message.id)
 
         // Store the contact on its own
-        self.contactStore.store(contact)
+        contactStore.store(contact)
 
         // There should still be only one contact
-        XCTAssertEqual(try self.contactsCount(), 1)
+        XCTAssertEqual(try contactsCount(), 1)
 
         // And the conversation should still point to the contact
-        XCTAssertEqual(try self.fetch(conversation)?.contact?.id, contact.id)
+        XCTAssertEqual(try fetch(conversation)?.contact?.id, contact.id)
 
         // Store the message on its own
-        self.messageStore.store(message)
+        messageStore.store(message)
 
         // There should still be only one message
-        XCTAssertEqual(try self.messagesCount(), 1)
+        XCTAssertEqual(try messagesCount(), 1)
 
         // And the conversation should still point to the message
-        XCTAssertEqual(try self.fetch(conversation)?.mostRecentMessage?.id, message.id)
+        XCTAssertEqual(try fetch(conversation)?.mostRecentMessage?.id, message.id)
     }
 
     // Store: Conversation, New Message (conversation should point to new message)
@@ -211,29 +211,29 @@ class CDTests: XCTestCase {
         let conversation = Conversation(contact: contact, mostRecentMessage: message)
 
         // Store the conversation
-        self.conversationStore.store(conversation)
+        conversationStore.store(conversation)
 
         // The message, and conversation should be stored (and there should be one of each)
-        XCTAssertEqual(try self.messagesCount(), 1)
-        XCTAssertEqual(try self.conversationsCount(), 1)
+        XCTAssertEqual(try messagesCount(), 1)
+        XCTAssertEqual(try conversationsCount(), 1)
 
         // The conversation should point to the message, and the inverse
-        XCTAssertEqual(try self.fetch(conversation)?.mostRecentMessage?.id, message.id)
-        XCTAssertEqual(try self.fetch(message)?.conversation?.messageListID, conversation.messageListID)
+        XCTAssertEqual(try fetch(conversation)?.mostRecentMessage?.id, message.id)
+        XCTAssertEqual(try fetch(message)?.conversation?.messageListID, conversation.messageListID)
 
         // Create a new message and store it
         let newMessage = Message(id: "message.2", messageListID: message.messageListID, body: "Two", timestamp: Date())
-        self.messageStore.store(newMessage)
+        messageStore.store(newMessage)
 
         // There should be two messages in the store
-        XCTAssertEqual(try self.messagesCount(), 2)
+        XCTAssertEqual(try messagesCount(), 2)
 
         // The conversation should point to the new message, and the inverse
-        XCTAssertEqual(try self.fetch(conversation)?.mostRecentMessage?.id, newMessage.id)
-        XCTAssertEqual(try self.fetch(newMessage)?.conversation?.messageListID, conversation.messageListID)
+        XCTAssertEqual(try fetch(conversation)?.mostRecentMessage?.id, newMessage.id)
+        XCTAssertEqual(try fetch(newMessage)?.conversation?.messageListID, conversation.messageListID)
 
         // The old message should not point to a conversation
-        XCTAssertNil(try self.fetch(message)?.conversation)
+        XCTAssertNil(try fetch(message)?.conversation)
     }
 
     // Store: Conversation, Old Message (conversation should still point to original message)
@@ -245,23 +245,23 @@ class CDTests: XCTestCase {
         let conversation = Conversation(contact: contact, mostRecentMessage: newerMessage)
 
         // Store the conversation
-        self.conversationStore.store(conversation)
+        conversationStore.store(conversation)
 
         // The message, and conversation should be stored (and there should be one of each)
-        XCTAssertEqual(try self.messagesCount(), 1)
-        XCTAssertEqual(try self.conversationsCount(), 1)
+        XCTAssertEqual(try messagesCount(), 1)
+        XCTAssertEqual(try conversationsCount(), 1)
 
         // The conversation should point to the newer message
-        XCTAssertEqual(try self.fetch(conversation)?.mostRecentMessage?.id, newerMessage.id)
+        XCTAssertEqual(try fetch(conversation)?.mostRecentMessage?.id, newerMessage.id)
 
         // Store the older message
-        self.messageStore.store(olderMessage)
+        messageStore.store(olderMessage)
 
         // There should be two messages in the store
-        XCTAssertEqual(try self.messagesCount(), 2)
+        XCTAssertEqual(try messagesCount(), 2)
 
         // The conversation should still point to the newer message
-        XCTAssertEqual(try self.fetch(conversation)?.mostRecentMessage?.id, newerMessage.id)
+        XCTAssertEqual(try fetch(conversation)?.mostRecentMessage?.id, newerMessage.id)
     }
 
     // Store: Conversation, New Message in different list (conversation should still point to the original message)
@@ -272,23 +272,23 @@ class CDTests: XCTestCase {
         let conversation = Conversation(contact: contact, mostRecentMessage: message)
 
         // Store the conversation
-        self.conversationStore.store(conversation)
+        conversationStore.store(conversation)
 
         // The message, and conversation should be stored (and there should be one of each)
-        XCTAssertEqual(try self.messagesCount(), 1)
-        XCTAssertEqual(try self.conversationsCount(), 1)
+        XCTAssertEqual(try messagesCount(), 1)
+        XCTAssertEqual(try conversationsCount(), 1)
 
         // The conversation should point to the newer message
-        XCTAssertEqual(try self.fetch(conversation)?.mostRecentMessage?.id, message.id)
+        XCTAssertEqual(try fetch(conversation)?.mostRecentMessage?.id, message.id)
 
         // Store the newer message (that's in a different list)
-        self.messageStore.store(messageInDifferentList)
+        messageStore.store(messageInDifferentList)
 
         // There should be two messages in the store
-        XCTAssertEqual(try self.messagesCount(), 2)
+        XCTAssertEqual(try messagesCount(), 2)
 
         // The conversation should still point to the original message
-        XCTAssertEqual(try self.fetch(conversation)?.mostRecentMessage?.id, message.id)
+        XCTAssertEqual(try fetch(conversation)?.mostRecentMessage?.id, message.id)
     }
 
     // Store: Conversation, Conversation (i.e. refresh the conversation. Relationships should be stable)
@@ -298,26 +298,26 @@ class CDTests: XCTestCase {
         let conversation = Conversation(contact: contact, mostRecentMessage: message)
 
         // Store the conversation
-        self.conversationStore.store(conversation)
+        conversationStore.store(conversation)
 
         // The contact, message, and conversation should be stored (and there should be one of each)
-        XCTAssertEqual(try self.contactsCount(), 1)
-        XCTAssertEqual(try self.messagesCount(), 1)
-        XCTAssertEqual(try self.conversationsCount(), 1)
+        XCTAssertEqual(try contactsCount(), 1)
+        XCTAssertEqual(try messagesCount(), 1)
+        XCTAssertEqual(try conversationsCount(), 1)
 
         // The conversation should point to the message, and the inverse
-        XCTAssertEqual(try self.fetch(conversation)?.mostRecentMessage?.id, message.id)
-        XCTAssertEqual(try self.fetch(message)?.conversation?.messageListID, conversation.messageListID)
+        XCTAssertEqual(try fetch(conversation)?.mostRecentMessage?.id, message.id)
+        XCTAssertEqual(try fetch(message)?.conversation?.messageListID, conversation.messageListID)
 
         // Store the conversation again (refresh)
-        self.conversationStore.store(conversation)
+        conversationStore.store(conversation)
 
         // The same tests as before should hold
-        XCTAssertEqual(try self.contactsCount(), 1)
-        XCTAssertEqual(try self.messagesCount(), 1)
-        XCTAssertEqual(try self.conversationsCount(), 1)
-        XCTAssertEqual(try self.fetch(conversation)?.mostRecentMessage?.id, message.id)
-        XCTAssertEqual(try self.fetch(message)?.conversation?.messageListID, conversation.messageListID)
+        XCTAssertEqual(try contactsCount(), 1)
+        XCTAssertEqual(try messagesCount(), 1)
+        XCTAssertEqual(try conversationsCount(), 1)
+        XCTAssertEqual(try fetch(conversation)?.mostRecentMessage?.id, message.id)
+        XCTAssertEqual(try fetch(message)?.conversation?.messageListID, conversation.messageListID)
     }
 
     // Store: Conversation, Updated Contact (conversation should have contact updates)
@@ -327,32 +327,32 @@ class CDTests: XCTestCase {
         let conversation = Conversation(contact: contact, mostRecentMessage: message)
 
         // Store the conversation
-        self.conversationStore.store(conversation)
+        conversationStore.store(conversation)
 
         // The contact and conversation should be stored (and there should be one of each)
-        XCTAssertEqual(try self.contactsCount(), 1)
-        XCTAssertEqual(try self.conversationsCount(), 1)
+        XCTAssertEqual(try contactsCount(), 1)
+        XCTAssertEqual(try conversationsCount(), 1)
 
         // The conversation should point to the contact, and the inverse
-        XCTAssertEqual(try self.fetch(conversation)?.contact?.id, contact.id)
-        XCTAssertEqual(try self.fetch(contact)?.conversation?.messageListID, conversation.messageListID)
+        XCTAssertEqual(try fetch(conversation)?.contact?.id, contact.id)
+        XCTAssertEqual(try fetch(contact)?.conversation?.messageListID, conversation.messageListID)
 
         // The conversation's contact should have the first contact's name
-        XCTAssertEqual(try self.fetch(conversation)?.contact?.name, contact.name)
+        XCTAssertEqual(try fetch(conversation)?.contact?.name, contact.name)
 
         // Update the contact and store it
         let updatedContact = Contact(id: contact.id, name: "Updated")
-        self.contactStore.store(updatedContact)
+        contactStore.store(updatedContact)
 
         // There should still only be one contact stored
-        XCTAssertEqual(try self.contactsCount(), 1)
+        XCTAssertEqual(try contactsCount(), 1)
 
         // The conversation should point to the updated contact, and the inverse
-        XCTAssertEqual(try self.fetch(conversation)?.contact?.id, updatedContact.id)
-        XCTAssertEqual(try self.fetch(updatedContact)?.conversation?.messageListID, conversation.messageListID)
+        XCTAssertEqual(try fetch(conversation)?.contact?.id, updatedContact.id)
+        XCTAssertEqual(try fetch(updatedContact)?.conversation?.messageListID, conversation.messageListID)
 
         // The conversation's contact should have the updated contact's name
-        XCTAssertEqual(try self.fetch(conversation)?.contact?.name, updatedContact.name)
+        XCTAssertEqual(try fetch(conversation)?.contact?.name, updatedContact.name)
     }
 
 }
