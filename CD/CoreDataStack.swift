@@ -9,15 +9,11 @@
 import Foundation
 import CoreData
 
-private let mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
-//private let mergePolicy = NSOverwriteMergePolicy
-//private let mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
-
 protocol CoreDataStackProtocol {
     init(modelName: String, url: URL?, type: String)
     var viewContext: NSManagedObjectContext { get }
-    var backgroundContext: NSManagedObjectContext { get }
-    func performBackgroundTask(_ task: @escaping (NSManagedObjectContext) -> Void)
+    func newBackgroundContext() -> NSManagedObjectContext
+    func performBackgroundTask(_ task: @escaping (NSManagedObjectContext) throws -> Void)
     func loadStore(_ completion: @escaping (Error?) -> Void)
     func close()
 }
@@ -25,16 +21,9 @@ protocol CoreDataStackProtocol {
 class CoreDataStack: CoreDataStackProtocol {
 
     private let coordinator: NSPersistentStoreCoordinator
-    private let _storeContext: NSManagedObjectContext
-    private let _viewContext: NSManagedObjectContext
+    private let storeContext: NSManagedObjectContext
 
-    var viewContext: NSManagedObjectContext {
-        return _viewContext
-    }
-
-    var backgroundContext: NSManagedObjectContext {
-        return newBackgroundContext()
-    }
+    let viewContext: NSManagedObjectContext
 
     required init(modelName: String, url: URL? = nil, type: String) {
         let model = NSManagedObjectModel.mergedModel(from: [.main])!
@@ -48,37 +37,56 @@ class CoreDataStack: CoreDataStackProtocol {
             print("Added store at: \(storeURL)")
         }
 
-        _storeContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        _storeContext.persistentStoreCoordinator = coordinator
-        _storeContext.mergePolicy = mergePolicy
+        storeContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        storeContext.persistentStoreCoordinator = coordinator
 
-        _viewContext = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
-        _viewContext.parent = _storeContext
-        _viewContext.mergePolicy = _storeContext.mergePolicy
+        viewContext = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
+        viewContext.parent = storeContext
+
+        [storeContext, viewContext].forEach(configure)
     }
 
     func loadStore(_ completion: @escaping (Error?) -> Void) {
         completion(nil)
     }
 
-    private func newBackgroundContext() -> NSManagedObjectContext {
+    func newBackgroundContext() -> NSManagedObjectContext {
         let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        context.parent = _viewContext
-        context.mergePolicy = _viewContext.mergePolicy
+        context.parent = viewContext
+        configure(context)
         return context
     }
 
-    func performBackgroundTask(_ task: @escaping (NSManagedObjectContext) -> Void) {
-        let context = backgroundContext
+    func performBackgroundTask(_ task: @escaping (NSManagedObjectContext) throws -> Void) {
+        let context = newBackgroundContext()
         context.performAndWait {
-            task(context)
-            self.saveContext(context, named: "background")
-            self.saveContext(self.viewContext, named: "view")
-            self.saveContext(self._storeContext, named: "_store")
+            do {
+                try task(context)
+                self.saveContext(self.viewContext)
+                self.saveContext(self.storeContext)
+            } catch {
+                let contextName = self.name(from: context)
+                print("An error occurred while performing a task on the \(contextName) context: \(error.humanReadableString)")
+            }
         }
     }
 
-    private func saveContext(_ context: NSManagedObjectContext, named name: String) {
+    private func configure(_ context: NSManagedObjectContext) {
+        context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+        context.undoManager = nil
+    }
+
+    private func name(from context: NSManagedObjectContext) -> String {
+        if context == self.storeContext {
+            return "store"
+        } else if context == self.viewContext {
+            return "view"
+        } else {
+            return "background"
+        }
+    }
+
+    private func saveContext(_ context: NSManagedObjectContext) {
         context.performAndWait {
             guard context.hasChanges else {
                 return
@@ -87,7 +95,8 @@ class CoreDataStack: CoreDataStackProtocol {
             do {
                 try context.save()
             } catch {
-                print("Failed to save \(name) context: \(error.humanReadableString)")
+                let contextName = self.name(from: context)
+                print("Failed to save \(contextName) context: \(error.humanReadableString)")
             }
         }
     }
