@@ -10,12 +10,18 @@ import Foundation
 import CoreData
 
 protocol CoreDataStackProtocol {
-    init(modelName: String, url: URL?, type: String) throws
+    /// The managed object context associated with the main queue.
     var viewContext: NSManagedObjectContext { get }
+
+    /// Creates a private managed object context.
     func newBackgroundContext() -> NSManagedObjectContext
+
+    /// Executes the task against a new private queue context.
+    /// - parameter task: The task to perform.
     func performBackgroundTask(_ task: @escaping (NSManagedObjectContext) throws -> Void)
-    func loadStore(_ completion: @escaping (Error?) -> Void)
-    func close()
+
+    /// Tears down and cleans up the stack for testing.
+    func tearDown()
 }
 
 class CoreDataStack: CoreDataStackProtocol {
@@ -25,7 +31,7 @@ class CoreDataStack: CoreDataStackProtocol {
 
     let viewContext: NSManagedObjectContext
 
-    required init(modelName: String, url: URL? = nil, type: String) throws {
+    init(modelName: String, url: URL? = nil, type: String) throws {
         let model = NSManagedObjectModel.mergedModel(from: [.main])!
         coordinator = NSPersistentStoreCoordinator(managedObjectModel: model)
         let options = [NSMigratePersistentStoresAutomaticallyOption: true,
@@ -48,10 +54,6 @@ class CoreDataStack: CoreDataStackProtocol {
 
     // MARK: - Public
 
-    func loadStore(_ completion: @escaping (Error?) -> Void) {
-        completion(nil)
-    }
-
     func newBackgroundContext() -> NSManagedObjectContext {
         let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         context.parent = viewContext
@@ -73,7 +75,7 @@ class CoreDataStack: CoreDataStackProtocol {
         }
     }
 
-    func close() {
+    func tearDown() {
         for store in coordinator.persistentStores {
             guard let url = store.url else {
                 continue
@@ -88,11 +90,13 @@ class CoreDataStack: CoreDataStackProtocol {
 
     // MARK: - Private
 
+    /// Configures a managed object context.
     private func configure(_ context: NSManagedObjectContext) {
         context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
         context.undoManager = nil
     }
 
+    /// Returns the name of the managed object context.
     private func name(from context: NSManagedObjectContext) -> String {
         if context == self.storeContext {
             return "store"
@@ -103,6 +107,7 @@ class CoreDataStack: CoreDataStackProtocol {
         }
     }
 
+    /// Saves a managed object context synchronously if it has changes.
     private func saveContext(_ context: NSManagedObjectContext) {
         context.performAndWait {
             guard context.hasChanges else {
