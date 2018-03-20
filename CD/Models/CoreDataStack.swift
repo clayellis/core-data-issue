@@ -9,6 +9,7 @@
 import Foundation
 import CoreData
 
+/// A stack that provides contexts and conveniences for working with Core Data.
 protocol CoreDataStackProtocol {
     /// The managed object context associated with the main queue.
     var viewContext: NSManagedObjectContext { get }
