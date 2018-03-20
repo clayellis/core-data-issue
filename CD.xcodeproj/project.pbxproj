@@ -100,8 +100,8 @@
 			isa = PBXGroup;
 			children = (
 				6F365E00205C2F0700ED1B28 /* CoreDataStack.swift */,
-				6F01975D20603FFB00751E11 /* Model.swift */,
 				6F01976B2060D6B700751E11 /* Context+Fetch.swift */,
+				6F01975D20603FFB00751E11 /* Model.swift */,
 				6F0197672060CE4500751E11 /* ModelData.swift */,
 				6F365DF1205C2CDF00ED1B28 /* Contact */,
 				6F365DF2205C2CE700ED1B28 /* Message */,
